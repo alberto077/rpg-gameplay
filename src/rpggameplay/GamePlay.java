@@ -5,10 +5,13 @@
  */
 package rpggameplay;
 import games.spell.ActionInterfaceForm;
+import java.awt.Dimension;
 import java.util.HashMap;
 import java.util.Map;
 import javax.swing.JOptionPane;
 import java.util.Random;
+import javax.swing.ImageIcon;
+import javax.swing.JLabel;
 /**
  *
  * @author administrator
@@ -18,12 +21,13 @@ public class GamePlay extends javax.swing.JFrame {
     /**
      * Creates new form GamePlay
      */
-    
-
     private int playerPosX;
     private int playerPosY;
     private int enemyPosX;
     private int enemyPosY;
+    private ImageIcon playerIcon;
+    private JLabel playerSpriteLabel;
+    private static final int TILE_SIZE = 64;
     
     
     
@@ -54,11 +58,10 @@ public class GamePlay extends javax.swing.JFrame {
         moveDownButton = new javax.swing.JButton();
         moveLeftButton = new javax.swing.JButton();
         moveRightButton = new javax.swing.JButton();
-        jScrollPane2 = new javax.swing.JScrollPane();
-        jTextArea2 = new javax.swing.JTextArea();
         jScrollPane3 = new javax.swing.JScrollPane();
         GameOutputTextPane = new javax.swing.JTextPane();
         jLabel3 = new javax.swing.JLabel();
+        mapPanel = new javax.swing.JPanel();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
         setMinimumSize(new java.awt.Dimension(600, 600));
@@ -103,14 +106,22 @@ public class GamePlay extends javax.swing.JFrame {
             }
         });
 
-        jTextArea2.setColumns(20);
-        jTextArea2.setFont(new java.awt.Font("Courier 10 Pitch", 0, 15)); // NOI18N
-        jTextArea2.setRows(5);
-        jScrollPane2.setViewportView(jTextArea2);
-
         jScrollPane3.setViewportView(GameOutputTextPane);
 
         jLabel3.setText("Game Output");
+
+        mapPanel.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout mapPanelLayout = new javax.swing.GroupLayout(mapPanel);
+        mapPanel.setLayout(mapPanelLayout);
+        mapPanelLayout.setHorizontalGroup(
+            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 327, Short.MAX_VALUE)
+        );
+        mapPanelLayout.setVerticalGroup(
+            mapPanelLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 182, Short.MAX_VALUE)
+        );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -133,7 +144,8 @@ public class GamePlay extends javax.swing.JFrame {
                                 .addComponent(StartGameButton)))
                         .addGap(57, 57, 57))
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2)
+                        .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, layout.createSequentialGroup()
                                 .addGap(99, 99, 99)
@@ -163,15 +175,15 @@ public class GamePlay extends javax.swing.JFrame {
                     .addComponent(StartGameButton))
                 .addGap(18, 18, 18)
                 .addComponent(jLabel2)
-                .addGap(18, 18, 18)
+                .addGap(28, 28, 28)
                 .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                     .addGroup(layout.createSequentialGroup()
-                        .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 204, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addGap(12, 12, 12)
+                        .addComponent(mapPanel, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addGap(29, 29, 29)
                         .addComponent(jLabel3)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED))
                     .addGroup(layout.createSequentialGroup()
-                        .addGap(10, 10, 10)
                         .addComponent(moveUpButton)
                         .addGap(30, 30, 30)
                         .addGroup(layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
@@ -180,7 +192,7 @@ public class GamePlay extends javax.swing.JFrame {
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                         .addComponent(moveDownButton)
                         .addGap(78, 78, 78)))
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 240, Short.MAX_VALUE)
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 238, Short.MAX_VALUE)
                 .addContainerGap())
         );
 
@@ -195,6 +207,16 @@ public class GamePlay extends javax.swing.JFrame {
          playerStats.put("Endurance", 10);
          playerStats.put("Dexterity", 10);
          playerStats.put("Intelligence", 10);
+         
+         playerIcon = new ImageIcon(getClass().getResource("/images/player.png"));
+         playerSpriteLabel = new JLabel(playerIcon);
+         playerSpriteLabel.setSize(TILE_SIZE,TILE_SIZE);
+         
+         playerSpriteLabel.setLocation(1*TILE_SIZE, 1*TILE_SIZE);
+         mapPanel.add(playerSpriteLabel);
+         mapPanel.setPreferredSize(new Dimension(5*TILE_SIZE, 5*TILE_SIZE));
+         
+         
          
          
     }
@@ -220,6 +242,7 @@ public class GamePlay extends javax.swing.JFrame {
                 }else if (enemyStats.get("HP") <= 0){
                     actionLog("You have Won the battle");
                     setEnemySpawn();
+                    updateSpriteLocation();
 
                 }
                 
@@ -263,8 +286,8 @@ public class GamePlay extends javax.swing.JFrame {
         }
     }
     private void setEnemySpawn(){
-        int posX = 1 + random.nextInt(10);
-        int posY = 1 + random.nextInt(10);
+        int posX = 1 + random.nextInt(4);
+        int posY = 1 + random.nextInt(4);
         
         enemyPosX = posX;
         enemyPosY = posY;
@@ -279,6 +302,7 @@ public class GamePlay extends javax.swing.JFrame {
         enemyStats.put("Strength", enemyStr);
         actionLog("Enemy has spawned at position X: " +enemyPosX+ " Y: " +enemyPosY);
     }
+    
     private void StartGameButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_StartGameButtonActionPerformed
         // TODO add your handling code here:
         String preamble = "RPG Game Started";
@@ -294,17 +318,28 @@ public class GamePlay extends javax.swing.JFrame {
         
     }//GEN-LAST:event_StartGameButtonActionPerformed
 
+    private void updateSpriteLocation(){
+        playerPosX = Math.max(0, Math.min(4, playerPosX)); //To not go out of bounds
+        playerPosY = Math.max(0, Math.min(4, playerPosY));
+        
+        playerSpriteLabel.setLocation(playerPosX*TILE_SIZE, playerPosY*TILE_SIZE);
+        
+    }
+    
     private void moveUpButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveUpButtonActionPerformed
         // TODO add your handling code here:
-        playerPosY ++;
+        playerPosY --;
         actionLog("Player Position: X:" +playerPosX+ "Y:" +playerPosY);
+        updateSpriteLocation();
         checkForEnemy();
     }//GEN-LAST:event_moveUpButtonActionPerformed
 
+    
     private void moveDownButtonActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_moveDownButtonActionPerformed
         // TODO add your handling code here:
-        playerPosY --;
+        playerPosY ++;
         actionLog("Player Position: X: " +playerPosX+ " Y: " +playerPosY);
+        updateSpriteLocation();
         checkForEnemy();
     }//GEN-LAST:event_moveDownButtonActionPerformed
 
@@ -312,6 +347,7 @@ public class GamePlay extends javax.swing.JFrame {
         // TODO add your handling code here:
         playerPosX --;
         actionLog("Player Position: X: " +playerPosX+ " Y: " +playerPosY);
+        updateSpriteLocation();
         checkForEnemy();
     }//GEN-LAST:event_moveLeftButtonActionPerformed
 
@@ -319,6 +355,7 @@ public class GamePlay extends javax.swing.JFrame {
         // TODO add your handling code here:
         playerPosX ++;
         actionLog("Player Position: X: " +playerPosX+ " Y: " +playerPosY);
+        updateSpriteLocation();
         checkForEnemy();
     }//GEN-LAST:event_moveRightButtonActionPerformed
     
@@ -374,9 +411,8 @@ public class GamePlay extends javax.swing.JFrame {
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
-    private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JScrollPane jScrollPane3;
-    private javax.swing.JTextArea jTextArea2;
+    private javax.swing.JPanel mapPanel;
     private javax.swing.JButton moveDownButton;
     private javax.swing.JButton moveLeftButton;
     private javax.swing.JButton moveRightButton;
